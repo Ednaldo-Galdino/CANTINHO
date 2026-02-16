@@ -60,9 +60,8 @@ function generateQuestion(subject, topic, difficulty, index) {
         `Alternativa D sobre ${topic}`
     ];
 
-    // Marcar qual é a correta
+    // Letra da resposta correta (apenas para a explicação)
     const correctLetter = String.fromCharCode(65 + correctIndex); // A=65, B=66, C=67, D=68
-    options[correctIndex] = `Alternativa ${correctLetter} sobre ${topic} (CORRETA)`;
 
     return {
         subject,
