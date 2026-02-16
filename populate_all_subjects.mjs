@@ -45,28 +45,103 @@ const questionTemplates = {
     }
 };
 
-// Função para gerar questão baseada em template
+// Bancas de concursos
+const bancas = ['CESPE', 'FGV', 'FCC', 'VUNESP', 'CESGRANRIO', 'IBFC', 'AOCP', 'CONSULPLAN'];
+
+// Gerador de alternativas realistas por matéria
+const optionGenerators = {
+    'Português': (topic, isCorrect) => {
+        const templates = {
+            'Ortografia': [
+                'A grafia correta é "exceção" com ç',
+                'Escreve-se "privilégio" com i',
+                'A palavra "análise" é acentuada',
+                'O correto é "beneficente" sem i'
+            ],
+            'Concordância': [
+                'O verbo deve concordar com o sujeito em número e pessoa',
+                'Admite-se a concordância ideológica em casos específicos',
+                'O verbo "haver" é impessoal quando indica existência',
+                'Sujeito composto posposto admite concordância com o núcleo mais próximo'
+            ],
+            'Regência': [
+                'O verbo "assistir" rege preposição "a" no sentido de presenciar',
+                'Preferir é transitivo direto e indireto, regendo "a"',
+                'O verbo "visar" dispensa preposição quando significa mirar',
+                'Aspirar rege preposição "a" no sentido de desejar'
+            ]
+        };
+        const opts = templates[topic] || [
+            `Conceito correto sobre ${topic.toLowerCase()}`,
+            `Definição adequada de ${topic.toLowerCase()}`,
+            `Interpretação correta do tema ${topic.toLowerCase()}`,
+            `Aplicação apropriada de ${topic.toLowerCase()}`
+        ];
+        return opts[Math.floor(Math.random() * opts.length)];
+    },
+    'Direito Constitucional': (topic) => {
+        const opts = [
+            `Segundo a CF/88, ${topic.toLowerCase()} está previsto no art. 5º`,
+            `A doutrina majoritária entende que ${topic.toLowerCase()} é cláusula pétrea`,
+            `O STF já decidiu pela constitucionalidade de ${topic.toLowerCase()}`,
+            `${topic} é princípio fundamental da República`
+        ];
+        return opts[Math.floor(Math.random() * opts.length)];
+    },
+    'Direito Administrativo': (topic) => {
+        const opts = [
+            `${topic} é princípio expresso na Lei 9.784/99`,
+            `A aplicação de ${topic.toLowerCase()} é obrigatória na Administração Pública`,
+            `${topic} decorre do princípio da legalidade`,
+            `O STJ entende que ${topic.toLowerCase()} é requisito essencial`
+        ];
+        return opts[Math.floor(Math.random() * opts.length)];
+    },
+    'default': (topic) => {
+        const opts = [
+            `Conceito correto sobre ${topic.toLowerCase()}`,
+            `Definição adequada de ${topic.toLowerCase()}`,
+            `Interpretação correta de ${topic.toLowerCase()}`,
+            `Aplicação apropriada de ${topic.toLowerCase()}`
+        ];
+        return opts[Math.floor(Math.random() * opts.length)];
+    }
+};
+
+// Função para gerar questão realista
 function generateQuestion(subject, topic, difficulty, index) {
     const questionNumber = index + 1;
+    const banca = bancas[Math.floor(Math.random() * bancas.length)];
 
     // Randomizar posição da resposta correta (0-3)
     const correctIndex = Math.floor(Math.random() * 4);
 
-    // Criar opções com a correta na posição randomizada
-    const options = [
-        `Alternativa A sobre ${topic}`,
-        `Alternativa B sobre ${topic}`,
-        `Alternativa C sobre ${topic}`,
-        `Alternativa D sobre ${topic}`
-    ];
+    // Gerador de opções para a matéria
+    const generator = optionGenerators[subject] || optionGenerators['default'];
 
-    // Letra da resposta correta (apenas para a explicação)
-    const correctLetter = String.fromCharCode(65 + correctIndex); // A=65, B=66, C=67, D=68
+    // Criar 4 opções diferentes
+    const options = [];
+    const usedOptions = new Set();
+
+    for (let i = 0; i < 4; i++) {
+        let option;
+        let attempts = 0;
+        do {
+            option = generator(topic, i === correctIndex);
+            attempts++;
+        } while (usedOptions.has(option) && attempts < 10);
+
+        usedOptions.add(option);
+        options.push(option);
+    }
+
+    // Letra da resposta correta
+    const correctLetter = String.fromCharCode(65 + correctIndex);
 
     return {
         subject,
         difficulty,
-        text: `[${subject} - ${topic}] Questão ${questionNumber}: Assinale a alternativa correta sobre ${topic.toLowerCase()}.`,
+        text: `(${banca}) Questão ${questionNumber} - ${topic}: Assinale a alternativa correta.`,
         options,
         correct_index: correctIndex,
         explanation: `A alternativa ${correctLetter} está correta porque apresenta o conceito adequado de ${topic.toLowerCase()} conforme a doutrina e jurisprudência majoritárias. As demais alternativas apresentam conceitos incorretos ou incompletos sobre o tema.`
