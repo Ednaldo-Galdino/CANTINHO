@@ -5,7 +5,7 @@ import * as supabaseService from './supabaseService';
 export const getQuestions = async (subject: string, amount: number, difficulty: string): Promise<Question[]> => {
     try {
         // Tentar buscar do Supabase primeiro
-        const supabaseQuestions = await supabaseService.getQuestions(subject as any, amount, difficulty as any);
+        const supabaseQuestions = await supabaseService.getQuestions(subject as any, difficulty as any, amount);
 
         if (supabaseQuestions && supabaseQuestions.length > 0) {
             return supabaseQuestions;
