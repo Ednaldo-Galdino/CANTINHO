@@ -49,18 +49,28 @@ const questionTemplates = {
 function generateQuestion(subject, topic, difficulty, index) {
     const questionNumber = index + 1;
 
+    // Randomizar posição da resposta correta (0-3)
+    const correctIndex = Math.floor(Math.random() * 4);
+
+    // Criar opções com a correta na posição randomizada
+    const options = [
+        `Alternativa A sobre ${topic}`,
+        `Alternativa B sobre ${topic}`,
+        `Alternativa C sobre ${topic}`,
+        `Alternativa D sobre ${topic}`
+    ];
+
+    // Marcar qual é a correta
+    const correctLetter = String.fromCharCode(65 + correctIndex); // A=65, B=66, C=67, D=68
+    options[correctIndex] = `Alternativa ${correctLetter} sobre ${topic} (CORRETA)`;
+
     return {
         subject,
         difficulty,
         text: `[${subject} - ${topic}] Questão ${questionNumber}: Assinale a alternativa correta sobre ${topic.toLowerCase()}.`,
-        options: [
-            `Alternativa A sobre ${topic}`,
-            `Alternativa B sobre ${topic}`,
-            `Alternativa C sobre ${topic} (CORRETA)`,
-            `Alternativa D sobre ${topic}`
-        ],
-        correct_index: 2,
-        explanation: `A alternativa C está correta porque apresenta o conceito adequado de ${topic.toLowerCase()} conforme a doutrina e jurisprudência majoritárias. As demais alternativas apresentam conceitos incorretos ou incompletos sobre o tema.`
+        options,
+        correct_index: correctIndex,
+        explanation: `A alternativa ${correctLetter} está correta porque apresenta o conceito adequado de ${topic.toLowerCase()} conforme a doutrina e jurisprudência majoritárias. As demais alternativas apresentam conceitos incorretos ou incompletos sobre o tema.`
     };
 }
 
